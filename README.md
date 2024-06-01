@@ -1,3 +1,4 @@
+# ConfigurableProgressionMessages
 
 Adds 6 chat messages that you can configure the contents of, along with when they appear in your runs. I made this mod to make it easy for people to make certain points in a run's progression feel a bit more special using a special chat message that gets sent automatically.
 
