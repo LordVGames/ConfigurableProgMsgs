@@ -2,6 +2,11 @@
 
 Adds 6 chat messages that you can configure the contents of, along with when they appear in your runs. I made this mod to make it easy for people to make certain points in a run's progression feel a bit more special using a special chat message that gets sent automatically.
 
+By default, a message when you start your first loop is sent.
+
+![demomsg](https://github.com/LordVGames/ConfigurableProgMsgs/assets/51967559/31b9f60f-1dfe-4c68-9eb8-2aacb1fa92f2)
+
+
 ### Config Options
 - The message itself
 - When a certain stage number is reached
