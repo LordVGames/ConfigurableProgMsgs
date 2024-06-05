@@ -9,6 +9,7 @@ By default, a message when you start your first loop is sent.
 
 ### Config Options
 - The message itself
+	- Extra messages can be added and one will be randomly picked when the message needs to be sent
 - When a certain stage number is reached
 	- Whether to send it again after a number of stages
 - When a loop starts
@@ -21,4 +22,4 @@ By default, a message when you start your first loop is sent.
 
 All chat messages also support the normal unity rich text formatting. You can find all the available formatting options [here](https://docs.unity3d.com/Packages/com.unity.textmeshpro@4.0/manual/RichTextSupportedTags.html).
 
-Even though this is my first mod, I've tested it a lot. If there are any problems or if you got a suggestion for the mod, then create an issue on the [github repo]() or ping me in the RoR2 modding discord.
+I've tested this a bunch by myself to make sure things work, but there may still be problems. If there are any, or if you got a suggestion for the mod, then create an issue on the [github repo]() or ping me in the RoR2 modding discord.

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using BepInEx;
 using BepInEx.Configuration;
 using RoR2;
@@ -14,19 +16,21 @@ namespace R2API.Utils
 
 namespace ConfigurableProgressionMessages
 {
-    [BepInPlugin("LordVGames.ConfigurableProgressionMessages", "ConfigurableProgressionMessages", "1.0.0")]
+    [BepInPlugin("LordVGames.ConfigurableProgressionMessages", "ConfigurableProgressionMessages", "1.1.0")]
     public class ConfigurableProgressionMessages : BaseUnityPlugin
     {
-        private static int ProgMsgAll_Count = 6;
         public enum WhenToSendMsg
         {
             Never,
             OnFirstTime,
             OnEveryTime
         }
+        private static string MultiMsgSeparator = "EXTRAMSG:";
+        private static int ProgMsgAll_Count = 6;
 
         private string CurrentSceneName;
         private int PreviousLoopClearCount = 0;
+        private int PreviousStageNum = 0;
         private bool HasVoidFieldsBeenVisited = false;
         private bool HasBazaarBeenVisited = false;
         private bool WasChatMsgSent = false;
@@ -93,6 +97,8 @@ namespace ConfigurableProgressionMessages
             {
                 HasBazaarBeenVisited = false;
                 HasVoidFieldsBeenVisited = false;
+                PreviousStageNum = 0;
+                PreviousLoopClearCount = 0;
                 ResetProgMsgAllSendOnStageX();
             };
             On.RoR2.Run.OnServerSceneChanged += (orig, self, sceneName) =>
@@ -104,6 +110,12 @@ namespace ConfigurableProgressionMessages
             {
                 orig(self);
                 int CurrentStageNum = Run.instance.stageClearCount + 1;
+                bool HasStageNumChanged = false;
+                if (CurrentStageNum > PreviousStageNum)
+                {
+                    HasStageNumChanged = true;
+                    PreviousStageNum = CurrentStageNum;
+                }
                 bool HasLoopStarted = false;
                 if (Run.instance.loopClearCount > PreviousLoopClearCount)
                 {
@@ -114,14 +126,11 @@ namespace ConfigurableProgressionMessages
                 for (int i = 0; i < ProgMsgAll_Count; i++)
                 {
                     WasChatMsgSent = false;
-                    if (CurrentStageNum == ProgMsgAll_SendOnStageX[i])
+                    if (HasStageNumChanged && CurrentStageNum == ProgMsgAll_SendOnStageX[i])
                     {
                         SendChatMsg(i);
-                        continue;
-                    }
-                    else if (CurrentStageNum == ProgMsgAll_SendOnStageX[i] + 1)
-                    {
                         ProgMsgAll_SendOnStageX[i] += ProgMsgAll_ReSendAfterXStages[i];
+                        continue;
                     }
                     if (HasLoopStarted)
                     {
@@ -194,7 +203,7 @@ namespace ConfigurableProgressionMessages
                 "Progression Message #1",
                 "Message to send",
                 "<size=125%><color=#005500>The planet is growing restless from your presence...</color></size>",
-                "The chat message that will be sent when the conditions are met. Leave blank for no message."
+                "The chat message that will be sent when the conditions are met. Leave blank for no message. If you want to include extra messages for the mod to randomly pick from put \"EXTRAMSG:\" before every message past the first one.\nI.E. \"my 1st message  EXTRAMSG: my 2nd message EXTRAMSG: my 3rd message\""
             );
             ProgMsg1_SendOnStageX = Config.Bind<int>(
                 "Progression Message #1",
@@ -231,7 +240,7 @@ namespace ConfigurableProgressionMessages
                 "Progression Message #2",
                 "Message to send",
                 "",
-                "The chat message that will be sent when the conditions are met. Leave blank for no message."
+                "The chat message that will be sent when the conditions are met. You can have no message or add extra messages in the same ways as the first message."
             );
             ProgMsg2_SendOnStageX = Config.Bind<int>(
                 "Progression Message #2",
@@ -268,7 +277,7 @@ namespace ConfigurableProgressionMessages
                 "Progression Message #3",
                 "Message to send",
                 "",
-                "The chat message that will be sent when the conditions are met. Leave blank for no message."
+                "The chat message that will be sent when the conditions are met. You can have no message or add extra messages in the same ways as the first message."
             );
             ProgMsg3_SendOnStageX = Config.Bind<int>(
                 "Progression Message #3",
@@ -305,7 +314,7 @@ namespace ConfigurableProgressionMessages
                 "Progression Message #4",
                 "Message to send",
                 "",
-                "The chat message that will be sent when the conditions are met. Leave blank for no message."
+                "The chat message that will be sent when the conditions are met. You can have no message or add extra messages in the same ways as the first message."
             );
             ProgMsg4_SendOnStageX = Config.Bind<int>(
                 "Progression Message #4",
@@ -342,7 +351,7 @@ namespace ConfigurableProgressionMessages
                 "Progression Message #5",
                 "Message to send",
                 "",
-                "The chat message that will be sent when the conditions are met. Leave blank for no message."
+                "The chat message that will be sent when the conditions are met. You can have no message or add extra messages in the same ways as the first message."
             );
             ProgMsg5_SendOnStageX = Config.Bind<int>(
                 "Progression Message #5",
@@ -379,7 +388,7 @@ namespace ConfigurableProgressionMessages
                 "Progression Message #6",
                 "Message to send",
                 "",
-                "The chat message that will be sent when the conditions are met. Leave blank for no message."
+                "The chat message that will be sent when the conditions are met. You can have no message or add extra messages in the same ways as the first message."
             );
             ProgMsg6_SendOnStageX = Config.Bind<int>(
                 "Progression Message #6",
@@ -469,11 +478,35 @@ namespace ConfigurableProgressionMessages
         private void SendChatMsg(int ArrayNum)
         {
             WasChatMsgSent = true;
+            string MsgToSend;
+            string ChosenProgMsg = ProgMsgAll_Message[ArrayNum];
+
+            if (ChosenProgMsg.Contains(MultiMsgSeparator))
+            {
+                MsgToSend = PickRandomMsgFromMultiMsg(ChosenProgMsg);
+            }
+            else
+            {
+                MsgToSend = ChosenProgMsg;
+            }
 
             // Partially ported from ChatMessage.Send in R2API.Utils
-            Chat.SimpleChatMessage simpleChatMessage = new Chat.SimpleChatMessage();
-            simpleChatMessage.baseToken = ProgMsgAll_Message[ArrayNum];
-            Chat.SendBroadcastChat(simpleChatMessage);
+            Chat.SimpleChatMessage ChatMsg = new Chat.SimpleChatMessage();
+            ChatMsg.baseToken = MsgToSend;
+            Chat.SendBroadcastChat(ChatMsg);
+        }
+
+        private string PickRandomMsgFromMultiMsg(string MultiMsg)
+        {
+            string[] MultiMsg_Split = Regex.Split(MultiMsg, MultiMsgSeparator);
+            for (int i = 0; i < MultiMsg_Split.Length; i++)
+            {
+                MultiMsg_Split[i] = MultiMsg_Split[i].Trim();
+            }
+            Random RNG = new Random();
+            int RndMsgIndex = RNG.Next(0, MultiMsg_Split.Length);
+           
+            return MultiMsg_Split[RndMsgIndex];
         }
     }
 }
