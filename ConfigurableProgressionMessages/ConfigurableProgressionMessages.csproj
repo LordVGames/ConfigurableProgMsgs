@@ -65,6 +65,9 @@
       <HintPath>libs\Rewired_Windows_Lib.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="RiskOfOptions">
+      <HintPath>C:\Users\Ian\AppData\Roaming\r2modmanPlus-local\RiskOfRain2\profiles\close to vanilla TEST WITH MOD\BepInEx\plugins\Rune580-Risk_Of_Options\RiskOfOptions\RiskOfOptions.dll</HintPath>
+    </Reference>
     <Reference Include="SimpleJSON">
       <HintPath>libs\SimpleJSON.dll</HintPath>
       <Private>false</Private>

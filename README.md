@@ -1,6 +1,6 @@
 # ConfigurableProgressionMessages
 
-Adds 6 chat messages that you can configure the contents of, along with when they appear in your runs. I made this mod to make it easy for people to make certain points in a run's progression feel a bit more special using a special chat message that gets sent automatically.
+Adds some chat messages that you can configure the contents of, along with when they appear in your runs. I made this mod to make it easy for people to make certain points in a run's progression feel a bit more special using a special chat message that gets sent automatically.
 
 By default, a message when you start your first loop is sent.
 
@@ -20,6 +20,10 @@ By default, a message when you start your first loop is sent.
 	- Either on the first visit or on every visit 
 	- AFAIK currently no mod lets you go to void fields multiple times in a run but whenever that happens it should work
 
-All chat messages also support the normal unity rich text formatting. You can find all the available formatting options [here](https://docs.unity3d.com/Packages/com.unity.textmeshpro@4.0/manual/RichTextSupportedTags.html).
+All of these are configurable in-game using [Risk of Options](https://thunderstore.io/package/Rune580/Risk_Of_Options/). When you change the contents of a message using it, the message(s) will be shown in the game chat for easy editing.
+
+All messages also support the Unity rich text formatting. You can find all the available formatting options [here](https://docs.unity3d.com/Packages/com.unity.textmeshpro@4.0/manual/RichTextSupportedTags.html).
+
+
 
 I've tested this a bunch by myself to make sure things work, but there may still be problems. If there are any, or if you got a suggestion for the mod, then create an issue on the [github repo]() or ping me in the RoR2 modding discord.
