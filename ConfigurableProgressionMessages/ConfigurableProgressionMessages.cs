@@ -30,6 +30,7 @@ namespace ConfigurableProgressionMessages
         }
         public static class ModConfigEntries
         {
+            public static ConfigEntry<bool> DebugLogging { get; set; }
             public static ConfigEntry<string>[] Messages { get; set; } = new ConfigEntry<string>[ProgMsgsCount];
             public static ConfigEntry<int>[] SendOnStageX { get; set; } = new ConfigEntry<int>[ProgMsgsCount];
             public static ConfigEntry<int>[] SendAgainAfterXStages { get; set; } = new ConfigEntry<int>[ProgMsgsCount];
@@ -39,6 +40,7 @@ namespace ConfigurableProgressionMessages
         }
         public class ConfigEntryNames
         {
+            public const string DebugLogging = "Enable debug logging";
             public const string Message = "Message to send";
             public const string SendOnStageX = "Send On Stage X";
             public const string SendAgainAfterXStages = "Send Again After X Stages";
@@ -47,15 +49,16 @@ namespace ConfigurableProgressionMessages
             public const string SendOnVoidFieldsVisit = "Send On Void Fields Visit";
         }
 
-        public const string DetailedMessageConfigDesc = "Leave blank for no message. If you want to include extra messages for the mod to randomly pick from put \"EXTRAMSG:\" before every message past the first one. If you really want to use \"EXTRAMSG:\" in a message, put a forward slash right before it.\nExample: \"my 1st message  EXTRAMSG: my 2nd message EXTRAMSG: my 3rd message with /EXTRAMSG:\"";
         public const string PluginName = "ConfigurableProgressionMessages";
-        public const string PluginVersion = "2.0.0";
+        public const string PluginVersion = "2.1.0";
         public const string PluginAuthor = "LordVGames";
         public const string PluginGUID = $"{PluginAuthor}.{PluginName}";
+
+        internal const string DetailedMessageConfigDesc = "Leave blank for no message. If you want to include extra messages for the mod to randomly pick from put \"EXTRAMSG:\" before every message past the first one. If you really want to use \"EXTRAMSG:\" in a message, put a forward slash right before it.\nExample: \"my 1st message  EXTRAMSG: my 2nd message EXTRAMSG: my 3rd message with /EXTRAMSG:\"";
         // Fun fact: If you change this & build the mod it'll automatically make and/or use the new amount progression messages w/o any other changes
-        public const int ProgMsgsCount = 8;
+        internal const int ProgMsgsCount = 8;
         //language=regex
-        public const string MultiMsgRegex = "(?<!/)(EXTRAMSG:)";
+        internal const string MultiMsgRegex = "(?<!/)(EXTRAMSG:)";
 
         private string CurrentSceneName;
         private int PreviousLoopClearCount = 0;
@@ -69,6 +72,7 @@ namespace ConfigurableProgressionMessages
         {
             Log.Init(Logger);
             ReadConfig();
+            SetupSettingChangedEvents();
 
             Run.onRunStartGlobal += (Run run) =>
             {
@@ -91,25 +95,39 @@ namespace ConfigurableProgressionMessages
                 orig(self);
                 int CurrentStageNum = Run.instance.stageClearCount + 1;
                 bool HasStageNumChanged = false;
+                bool HasLoopStarted = false;
                 if (CurrentStageNum > PreviousStageNum)
                 {
                     HasStageNumChanged = true;
                     PreviousStageNum = CurrentStageNum;
                 }
-                bool HasLoopStarted = false;
                 if (Run.instance.loopClearCount > PreviousLoopClearCount)
                 {
                     HasLoopStarted = true;
                     PreviousLoopClearCount = Run.instance.loopClearCount;
                 }
+                if (ModConfigEntries.DebugLogging.Value)
+                {
+                    Log.Debug($"Current scene name is \"{CurrentSceneName}\". \"arena\" is the Void Fields, \"bazaar\" is the Bazaar");
+                    Log.Debug($"Did a loop start this stage? {HasLoopStarted}");
+                    Log.Debug($"Current stage number is {CurrentStageNum}");
+                    Log.Debug($"Did the stage number changes from last stage? {HasStageNumChanged}");
+                }
 
                 for (int i = 0; i < ProgMsgsCount; i++)
                 {
                     WasChatMsgSent = false;
-                    if (HasStageNumChanged && CurrentStageNum == ModConfigEntries.SendOnStageX[i].Value)
+                    if (HasStageNumChanged && CurrentStageNum == TempSendOnStageXValues[i])
                     {
                         SendProgMsg(i);
-                        ModConfigEntries.SendOnStageX[i].Value += ModConfigEntries.SendAgainAfterXStages[i].Value;
+                        if (ModConfigEntries.SendAgainAfterXStages[i].Value > 0)
+                        {
+                            TempSendOnStageXValues[i] += ModConfigEntries.SendAgainAfterXStages[i].Value;
+                            if (ModConfigEntries.DebugLogging.Value)
+                            {
+                                Log.Debug($"Message #{i + 1} will send again on stage {TempSendOnStageXValues[i]}, {ModConfigEntries.SendAgainAfterXStages[i].Value} stages after the current one.");
+                            }
+                        }
                         continue;
                     }
                     if (HasLoopStarted)
@@ -170,11 +188,17 @@ namespace ConfigurableProgressionMessages
                     }
                 }
             };
-            SetupSettingChangedEvents();
         }
 
         private void ReadConfig()
         {
+            ModConfigEntries.DebugLogging = Config.Bind(
+                "General",
+                ConfigEntryNames.DebugLogging,
+                false,
+                "Only useful if you're trying to figure out a problem either with your messages or the mod itself."
+            );
+
             for (int i = 0; i < ProgMsgsCount; i++)
             {
                 string SectionName = $"Progression Message #{i + 1}";
@@ -238,10 +262,10 @@ namespace ConfigurableProgressionMessages
             for (int i = 0; i < ProgMsgsCount; i++)
             {
                 // "i" has to be copied here because lambda expressions will get a reference instead of a copy to the original "i" and mess things up later
-                int ic = i;
-                ModConfigEntries.Messages[ic].SettingChanged += (sender, args) =>
+                int ir = i;
+                ModConfigEntries.Messages[ir].SettingChanged += (sender, args) =>
                 {
-                    SendChangedProgMsgToClientChat(ModConfigEntries.Messages[ic].Value, ic);
+                    SendChangedProgMsgToClientChat(ModConfigEntries.Messages[ir].Value, ir);
                 };
             }
         }
