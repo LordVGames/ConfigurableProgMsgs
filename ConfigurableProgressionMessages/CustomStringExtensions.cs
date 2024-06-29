@@ -5,13 +5,13 @@ namespace CustomStringExtensions
 {
     public static class CustomStringExtensions
     {
-        public static bool ProgMsgIsMultiMsg(this string ProgMsg) => Regex.Match(ProgMsg, MultiMsgRegex).Success;
+        public static bool IsMultiMsg(this string progMsg) => Regex.Match(progMsg, multiMsgRegex).Success;
 
-        public static string CleanUpProgMsg(this string Msg)
+        public static string CleanUpProgMsg(this string msg)
         {
-            Msg = Msg.Replace("/EXTRAMSG:", "EXTRAMSG:");
-            Msg = Msg.Trim();
-            return Msg;
+            msg = msg.Replace("/EXTRAMSG:", "EXTRAMSG:");
+            msg = msg.Trim();
+            return msg;
         }
     }
 }
