@@ -26,4 +26,12 @@ All messages also support the Unity rich text formatting. You can find all the a
 
 
 
-I've tested this a bunch by myself to make sure things work, but there may still be problems. If there are any, or if you got a suggestion for the mod, then create an issue on the [github repo]() or ping me in the RoR2 modding discord.
+I've tested this myself to make sure things work, but there may still be problems. If there are any, or if you got a suggestion for the mod, then create an issue on the [github repo]() or ping me in the RoR2 modding discord.
+
+
+### Where's the unity project for assetbundle?
+I would've put the unity project for the mod's assetbundle in the repo, but it's literally just for the icon for RiskOfOptions (1 file) and I'd rather not increase the repo storage size by 5x (10mb C# solution, 50mb unity project).
+
+I will provide a screenshot of the unity window showing it's just the icon file & assetbundle setup though:
+
+![image](https://github.com/LordVGames/ConfigurableProgMsgs/assets/51967559/f808a883-228c-47f5-8e19-22e8fb5a403e)
