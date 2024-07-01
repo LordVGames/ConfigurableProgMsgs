@@ -53,6 +53,7 @@ namespace ConfigurableProgressionMessages
         public const string PluginVersion = "2.1.0";
         public const string PluginAuthor = "LordVGames";
         public const string PluginGUID = $"{PluginAuthor}.{PluginName}";
+        public static PluginInfo PInfo { get; private set; }
 
         internal const string detailedMessageConfigDesc = "Leave blank for no message. If you want to include extra messages for the mod to randomly pick from put \"EXTRAMSG:\" before every message past the first one. If you really want to use \"EXTRAMSG:\" in a message, put a forward slash right before it.\nExample: \"my 1st message  EXTRAMSG: my 2nd message EXTRAMSG: my 3rd message with /EXTRAMSG:\"";
         // Fun fact: If you change this & build the mod it'll automatically make and/or use the new amount progression messages w/o any other changes
@@ -70,7 +71,9 @@ namespace ConfigurableProgressionMessages
 
         public void Awake()
         {
+            PInfo = Info;
             Log.Init(Logger);
+            Assets.Init();
             ReadConfig();
             SetupSettingChangedEvents();
 

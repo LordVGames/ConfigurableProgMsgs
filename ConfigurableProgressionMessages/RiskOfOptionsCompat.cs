@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using RiskOfOptions;
-using RiskOfOptions.Options;
+﻿using RiskOfOptions;
 using RiskOfOptions.OptionConfigs;
+using RiskOfOptions.Options;
+using UnityEngine;
 
 namespace ConfigurableProgressionMessages
 {
@@ -23,8 +23,7 @@ namespace ConfigurableProgressionMessages
 
         public static void AddProgMsgsToRiskOfOptions()
         {
-            
-
+            ModSettingsManager.SetModIcon(Assets.ModIconAssetBundle.LoadAsset<Sprite>("icon.png"));
             ModSettingsManager.SetModDescription("Adds some chat messages that you can configure the contents of, along with when they appear in your runs.");
             for (int i = 0; i < ConfigurableProgressionMessages.progMsgsCount; i++)
             {

@@ -83,7 +83,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /y &quot;$(TargetPath)&quot; &quot;%25appdata%25\r2modmanPlus-local\RiskOfRain2\profiles\close to vanilla TEST WITH MOD\BepInEx\plugins&quot;&#xD;&#xA;start &quot;&quot; &quot;D:\Steam on SSD\steamapps\common\Risk of Rain 2\Risk of Rain 2.exe - Close to Vanilla Test WITH MOD.lnk&quot;" />
+    <Exec Command="copy /y &quot;$(TargetPath)&quot; &quot;%25appdata%25\r2modmanPlus-local\RiskOfRain2\profiles\close to vanilla TEST WITH MOD\BepInEx\plugins\LordVGames-ConfigurableProgressionMessages\ConfigurableProgressionMessages&quot;&#xD;&#xA;start &quot;&quot; &quot;D:\Steam on SSD\steamapps\common\Risk of Rain 2\Risk of Rain 2.exe - Close to Vanilla Test WITH MOD.lnk&quot;" />
   </Target>
 
 </Project>
